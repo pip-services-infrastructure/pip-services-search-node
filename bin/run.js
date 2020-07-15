@@ -1,7 +1,9 @@
 let SearchProcess = require('../obj/src/container/SearchProcess').SearchProcess;
 
 try {
-    new SearchProcess().run(process.argv);
+    let proc = new SearchProcess();
+    proc._configPath = "./config/config.yml";
+    proc.run(process.argv);
 } catch (ex) {
     console.error(ex);
 }

@@ -3,65 +3,51 @@
 // import { FilterParams } from 'pip-services3-commons-node';
 // import { PagingParams } from 'pip-services3-commons-node';
 // import { DataPage } from 'pip-services3-commons-node';
-// import { IdentifiableMemoryPersistence } from 'pip-services3-data-node';
-// import { TagsProcessor } from 'pip-services3-commons-node';
 
-// import { SearchV1 } from '../data/version1/SearchV1';
+// import { IdentifiableMemoryPersistence } from 'pip-services3-data-node';
+
+// import { SearchRecordV1 } from '../data/version1/SearchRecordV1';
 // import { ISearchPersistence } from './ISearchPersistence';
 
-// export class SearchMemoryPersistence 
-//     extends IdentifiableMemoryPersistence<SearchV1, string> 
-//     implements ISearchPersistence {
+// export class SearchMemoryPersistence
+//   extends IdentifiableMemoryPersistence<SearchRecordV1, string>
+//   implements ISearchPersistence {
 
-//     constructor() {
-//         super();
-//     }
+//   constructor() {
+//     super();
 
-//     private contains(array1, array2) {
-//         if (array1 == null || array2 == null) return false;
-        
-//         for (let i1 = 0; i1 < array1.length; i1++) {
-//             for (let i2 = 0; i2 < array2.length; i2++)
-//                 if (array1[i1] == array2[i1]) 
-//                     return true;
-//         }
-        
+//     this._maxPageSize = 1000;
+//   }
+
+//   private composeFilter(filter: FilterParams): any {
+//     filter = filter || new FilterParams();
+
+//     let id = filter.getAsNullableString('id');
+//     let bankName = filter.getAsNullableString('bank_name');
+//     let routingNum = filter.getAsNullableString('routing_num');
+//     let accountNum = filter.getAsNullableString('account_num');
+//     let fromRegTime = filter.getAsNullableDateTime('from_register_time');
+//     let toRegTime = filter.getAsNullableDateTime('to_register_time');
+
+//     return (item) => {
+//       if (id != null && item.id != id)
 //         return false;
-//     }
-    
-//     private composeFilter(filter: FilterParams): any {
-//         filter = filter || new FilterParams();
-        
-//         let id = filter.getAsNullableString('id');
-//         let state = filter.getAsNullableString('state');
-//         let customerId = filter.getAsNullableString('customer_id');
-//         let saved = filter.getAsNullableBoolean('saved');
-//         let ids = filter.getAsObject('ids');
-                
-//         // Process ids filter
-//         if (_.isString(ids))
-//             ids = ids.split(',');
-//         if (!_.isArray(ids))
-//             ids = null;
-        
-//         return (item) => {
-//             if (id && item.id != id) 
-//                 return false;
-//             if (ids && _.indexOf(ids, item.id) < 0)
-//                 return false;
-//             if (state && item.state != state) 
-//                 return false;
-//             if (customerId && item.customer_id != customerId) 
-//                 return false;
-//             if (saved != null && item.saved != saved) 
-//                 return false;
-//             return true; 
-//         };
-//     }
+//       if (bankName != null && item.bank_name != bankName)
+//         return false;
+//       if (routingNum != null && item.routing_num != routingNum)
+//         return false;
+//       if (accountNum != null && item.account_num != accountNum)
+//         return false;
+//       if (fromRegTime != null && item.register_time >= fromRegTime)
+//         return false;
+//       if (toRegTime != null && item.register_time < toRegTime)
+//         return false;
+//       return true;
+//     };
+//   }
 
-//     public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams,
-//         callback: (err: any, page: DataPage<SearchV1>) => void): void {
-//         super.getPageByFilter(correlationId, this.composeFilter(filter), paging, null, null, callback);
-//     }
-
+//   public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams,
+//     callback: (err: any, page: DataPage<SearchRecordV1>) => void): void {
+//     super.getPageByFilter(correlationId, this.composeFilter(filter), paging, null, null, callback);
+//   }
 // }

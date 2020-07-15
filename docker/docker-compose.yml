@@ -2,20 +2,20 @@ version: '3.3'
 
 services:
 
-  test:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    image: ${IMAGE:-pipdevs/app}
-    links:
+  app:
+    image: ${IMAGE:-app}
+    ports:
+      - "8080:8080"  
+    depends_on:
       - mongo
     environment:
-      - MONGO_SERVICE_URI=
+      - HTTP_ENABLED=true
+      - HTTP_PORT=8080
+      - MONGO_ENABLED=true
       - MONGO_SERVICE_HOST=mongo
       - MONGO_SERVICE_PORT=27017
-      - MONGO_DB=app
-    ports:
-      - "8080:8080"
 
   mongo:
     image: mongo:latest
+    # ports:
+    #   - "27017:27017"

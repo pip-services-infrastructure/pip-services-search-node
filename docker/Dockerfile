@@ -1,34 +1,25 @@
-FROM pipdevs/node:8.4.0
+# Start with the Node.js 8 image
+FROM node:8
 
-# Install git and ssh
-RUN apk update && apk add git && apk add openssh
-
-# Copy local ssh keys
-COPY docker/id_rsa /root/.ssh/
-
-# Setup ssh access to github repositories
-RUN chmod 600 /root/.ssh/id_rsa* \
-    && ssh-keyscan github.com >> ~/.ssh/known_hosts \
-    && ssh-keyscan gitlab.com >> ~/.ssh/known_hosts 
-
-# Set working directory
+# Set a working directory
 WORKDIR /app
 
-# Copy project file
-COPY package.json .
+# Copy the project file
+COPY package*.json ./
 
 # Install ALL node_modules, including 'devDependencies'
 RUN npm install
 
-# Copy entire project
+# Copy the entire project
 COPY . .
 
-# set default environment variables
-ENV MONGO_SERVICE_URI ""
-ENV MONGO_SERVICE_HOST mongo
-ENV MONGO_SERVICE_PORT 27017
-ENV MONGO_DB app
+# Set the required environment variables
+ENV HTTP_PORT=8080
+ENV MONGO_SERVICE_HOST=
+ENV MONGO_SERVICE_PORT=27017
 
-EXPOSE 8080
+# Expose the HTTP port
+EXPOSE "8080:8080"
 
-ENTRYPOINT [ "node", "./bin/run.js" ]
+# Specify the command for running the service
+CMD [ "node", "bin/run.js" ]

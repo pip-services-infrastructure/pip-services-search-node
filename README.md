@@ -1,7 +1,7 @@
 # <img src="https://github.com/pip-services/pip-services/raw/master/design/Logo.png" alt="Pip.Services Logo" style="max-width:30%"> <br/> Search microservice
 
 This is Search microservice from Pip.Services library. 
-It stores customer Search internally or in external PCI-complient service like Paypal
+It stores customer Mappings internally or in external PCI-complient service like Paypal
 
 The microservice currently supports the following deployment options:
 * Deployment platforms: Standalone Process, Seneca
@@ -17,7 +17,7 @@ This microservice has no dependencies on other microservices.
 * [Configuration Guide](doc/Configuration.md)
 * [Deployment Guide](doc/Deployment.md)
 * Client SDKs
-  - [Node.js SDK](https://github.com/pip-services/pip-clients-search-node)
+  - [Node.js SDK](https://github.com/pip-services/pip-clients-mappings-node)
 * Communication Protocols
   - [HTTP Version 1](doc/HttpProtocolV1.md)
   - [Seneca Version 1](doc/SenecaProtocolV1.md)
@@ -38,7 +38,7 @@ class RatingV1 {
     public country_code: string; // ISO 3166-1
 }
 
-class SearchV1 implements IStringIdentifiable {
+class MappingV1 implements IStringIdentifiable {
     public id: string;
     public customer_id: string;
 
@@ -60,34 +60,34 @@ class SearchV1 implements IStringIdentifiable {
     public default?: boolean;
 }
 
-class SearchTypeV1 {
+class MappingTypeV1 {
     public static readonly Visa = "visa";
-    public static readonly Mastersearch = "mastersearch";
+    public static readonly Mastermapping = "mastermapping";
     public static readonly AmericanExpress = "amex";
     public static readonly Discover = "discover";
     public static readonly Maestro = "maestro";
 }
 
-class SearchStateV1 {
+class MappingStateV1 {
     public static Ok: string = "ok";
     public static Expired: string = "expired";
 }
 
-interface ISearchV1 {
-    getSearch(correlationId: string, filter: FilterParams, paging: PagingParams, 
-        callback: (err: any, page: DataPage<SearchV1>) => void): void;
+interface IMappingsV1 {
+    getMappings(correlationId: string, filter: FilterParams, paging: PagingParams, 
+        callback: (err: any, page: DataPage<MappingV1>) => void): void;
 
-    getSearchById(correlationId: string, search_id: string, 
-        callback: (err: any, search: SearchV1) => void): void;
+    getMappingById(correlationId: string, mapping_id: string, 
+        callback: (err: any, mapping: MappingV1) => void): void;
 
-    createSearch(correlationId: string, search: SearchV1, 
-        callback: (err: any, search: SearchV1) => void): void;
+    createMapping(correlationId: string, mapping: MappingV1, 
+        callback: (err: any, mapping: MappingV1) => void): void;
 
-    updateSearch(correlationId: string, search: SearchV1, 
-        callback: (err: any, search: SearchV1) => void): void;
+    updateMapping(correlationId: string, mapping: MappingV1, 
+        callback: (err: any, mapping: MappingV1) => void): void;
 
-    deleteSearchById(correlationId: string, search_id: string,
-        callback: (err: any, search: SearchV1) => void): void;
+    deleteMappingById(correlationId: string, mapping_id: string,
+        callback: (err: any, mapping: MappingV1) => void): void;
 }
 ```
 
@@ -95,7 +95,7 @@ interface ISearchV1 {
 
 Right now the only way to get the microservice is to check it out directly from github repository
 ```bash
-git clone git@github.com:pip-services-integration/pip-services-search-node.git
+git clone git@github.com:pip-services-integration/pip-services-mappings-node.git
 ```
 
 Pip.Service team is working to implement packaging and make stable releases available for your 
@@ -109,18 +109,18 @@ As the starting point you can use example configuration from **config.example.ym
 Example of microservice configuration
 ```yaml
 - descriptor: "pip-services-container:container-info:default:default:1.0"
-  name: "pip-services-search"
-  description: "Search microservice"
+  name: "pip-services-mappings"
+  description: "Mappings microservice"
 
 - descriptor: "pip-services-commons:logger:console:default:1.0"
   level: "trace"
 
-- descriptor: "pip-services-search:persistence:file:default:1.0"
-  path: "./data/search.json"
+- descriptor: "pip-services-mappings:persistence:file:default:1.0"
+  path: "./data/mappings.json"
 
-- descriptor: "pip-services-search:controller:default:default:1.0"
+- descriptor: "pip-services-mappings:controller:default:default:1.0"
 
-- descriptor: "pip-services-search:service:http:default:1.0"
+- descriptor: "pip-services-mappings:service:http:default:1.0"
   connection:
     protocol: "http"
     host: "0.0.0.0"
@@ -145,7 +145,7 @@ If you use Node.js then you should add dependency to the client SDK into **packa
     ...
     "dependencies": {
         ....
-        "pip-clients-search-node": "^1.1.*",
+        "pip-clients-mappings-node": "^1.1.*",
         ...
     }
 }
@@ -153,7 +153,7 @@ If you use Node.js then you should add dependency to the client SDK into **packa
 
 Inside your code get the reference to the client SDK
 ```javascript
-var sdk = new require('pip-clients-search-node');
+var sdk = new require('pip-clients-mappings-node');
 ```
 
 Define client configuration parameters that match configuration of the microservice external API
@@ -171,7 +171,7 @@ var config = {
 Instantiate the client and open connection to the microservice
 ```javascript
 // Create the client instance
-var client = sdk.SearchHttpClientV1(config);
+var client = sdk.MappingsHttpClientV1(config);
 
 // Connect to the microservice
 client.open(null, function(err) {
@@ -188,8 +188,8 @@ client.open(null, function(err) {
 
 Now the client is ready to perform operations
 ```javascript
-// Create a new search
-var search = {
+// Create a new mapping
+var mapping = {
     customer_id: '1',
     type: 'visa',
     number: '1111111111111111',
@@ -204,24 +204,24 @@ var search = {
         country_code: 'US'
     },
     ccv: '213',
-    name: 'Test Search 1',
+    name: 'Test Mapping 1',
     saved: true,
     default: true,
     state: 'ok'
 };
 
-client.createSearch(
+client.createMapping(
     null,
-    search,
-    function (err, search) {
+    mapping,
+    function (err, mapping) {
         ...
     }
 );
 ```
 
 ```javascript
-// Get the list of search on 'time management' topic
-client.getSearch(
+// Get the list of mappings on 'time management' topic
+client.getMappings(
     null,
     {
         customer_id: '1',

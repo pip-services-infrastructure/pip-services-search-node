@@ -5,23 +5,25 @@
 // import { SearchMongoDbPersistence } from '../../src/persistence/SearchMongoDbPersistence';
 // import { SearchPersistenceFixture } from './SearchPersistenceFixture';
 
-// suite('SearchMongoDbPersistence', ()=> {
+// suite('SearchMongoDbPersistence', () => {
 //     let persistence: SearchMongoDbPersistence;
 //     let fixture: SearchPersistenceFixture;
 
 //     setup((done) => {
-//         var MONGO_DB = process.env["MONGO_DB"] || "test";
-//         var MONGO_COLLECTION = process.env["MONGO_COLLECTION"] || "search";
-//         var MONGO_SERVICE_HOST = process.env["MONGO_SERVICE_HOST"] || "localhost";
-//         var MONGO_SERVICE_PORT = process.env["MONGO_SERVICE_PORT"] || "27017";
-//         var MONGO_SERVICE_URI = process.env["MONGO_SERVICE_URI"];
+//         let mongoUri = process.env['MONGO_SERVICE_URI'];
+//         let mongoHost = process.env['MONGO_SERVICE_HOST'] || 'localhost';
+//         let mongoPort = process.env['MONGO_SERVICE_PORT'] || 27017;
+//         let mongoDatabase = process.env['MONGO_SERVICE_DB'] || 'test';
+//         // Exit if mongo connection is not set
+//         if (mongoUri == '' && mongoHost == '')
+//             return;
+
 
 //         var dbConfig = ConfigParams.fromTuples(
-//             "collection", MONGO_COLLECTION,
-//             "connection.database", MONGO_DB,
-//             "connection.host", MONGO_SERVICE_HOST,
-//             "connection.port", MONGO_SERVICE_PORT,
-//             "connection.uri", MONGO_SERVICE_URI
+//             'connection.uri', mongoUri,
+//             'connection.host', mongoHost,
+//             'connection.port', mongoPort,
+//             'connection.database', mongoDatabase
 //         );
 
 //         persistence = new SearchMongoDbPersistence();
@@ -29,13 +31,17 @@
 
 //         fixture = new SearchPersistenceFixture(persistence);
 
-//         persistence.open(null, (err: any) => {
+//         persistence.open(null, (err) => {
+//             if (err) {
+//                 done(err);
+//                 return;
+//             }
 //             persistence.clear(null, (err) => {
 //                 done(err);
 //             });
 //         });
 //     });
-    
+
 //     teardown((done) => {
 //         persistence.close(null, done);
 //     });
@@ -45,7 +51,7 @@
 //     });
 
 //     test('Get with Filters', (done) => {
-//         fixture.testGetWithFilter(done);
+//         fixture.testGetWithFilters(done);
 //     });
 
 // });

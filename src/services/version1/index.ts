@@ -1,1 +1,1 @@
-// export { SearchHttpServiceV1 } from './SearchHttpServiceV1';
+// export { SearchCommandableHttpServiceV1 } from './SearchCommandableHttpServiceV1';

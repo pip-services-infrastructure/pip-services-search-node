@@ -1,11 +1,15 @@
 // let async = require('async');
 // let assert = require('chai').assert;
 
+// import { ConfigParams } from 'pip-services3-commons-node';
+// import { Descriptor } from 'pip-services3-commons-node';
+// import { References } from 'pip-services3-commons-node';
 // import { FilterParams } from 'pip-services3-commons-node';
 // import { PagingParams } from 'pip-services3-commons-node';
 
 // import { SearchRecordV1 } from '../../src/data/version1/SearchRecordV1';
-// import { ISearchPersistence } from '../../src/persistence/ISearchPersistence';
+// import { SearchMemoryPersistence } from '../../src/persistence/SearchMemoryPersistence';
+// import { SearchController } from '../../src/logic/SearchController';
 
 // const RECORD1: SearchRecordV1 = {
 //     id: '1',
@@ -23,28 +27,39 @@
 //     account_num: '222222',
 //     routing_num: '222222'
 // };
-// const RECORD3: SearchRecordV1 = {
-//     id: '3',
-//     about: 'Test about 3',
-//     register_time: new Date(),
-//     bank_name: 'Bank 1',
-//     account_num: '333333',
-//     routing_num: '333333'
-// };
 
-// export class SearchPersistenceFixture {
-//     private _persistence: ISearchPersistence;
+// suite('SearchController', () => {
+//     let persistence: SearchMemoryPersistence;
+//     let controller: SearchController;
 
-//     public constructor(persistence: ISearchPersistence) {
-//         assert.isNotNull(persistence);
-//         this._persistence = persistence;
-//     }
+//     setup((done) => {
+//         persistence = new SearchMemoryPersistence();
+//         persistence.configure(new ConfigParams());
 
-//     private testCreateSearch(done) {
+//         controller = new SearchController();
+//         controller.configure(new ConfigParams());
+
+//         let references = References.fromTuples(
+//             new Descriptor('pip-services-search', 'persistence', 'memory', 'default', '1.0'), persistence,
+//             new Descriptor('pip-services-search', 'controller', 'default', 'default', '1.0'), controller
+//         );
+
+//         controller.setReferences(references);
+
+//         persistence.open(null, done);
+//     });
+
+//     teardown((done) => {
+//         persistence.close(null, done);
+//     });
+
+//     test('CRUD Operations', (done) => {
+//         let record1: SearchRecordV1;
+
 //         async.series([
 //             // Create the first record
 //             (callback) => {
-//                 this._persistence.create(
+//                 controller.setRecord(
 //                     null,
 //                     RECORD1,
 //                     (err, record) => {
@@ -64,7 +79,7 @@
 //             },
 //             // Create the second record
 //             (callback) => {
-//                 this._persistence.create(
+//                 controller.setRecord(
 //                     null,
 //                     RECORD2,
 //                     (err, record) => {
@@ -82,40 +97,9 @@
 //                     }
 //                 );
 //             },
-//             // Create the third record
-//             (callback) => {
-//                 this._persistence.create(
-//                     null,
-//                     RECORD3,
-//                     (err, record) => {
-//                         assert.isNull(err);
-
-//                         assert.isObject(record);
-//                         assert.equal(RECORD3.id, record.id);
-//                         assert.equal(RECORD3.about, record.about);
-//                         assert.equal(RECORD3.register_time.getTime(), record.register_time.getTime());
-//                         assert.equal(RECORD3.bank_name, record.bank_name);
-//                         assert.equal(RECORD3.account_num, record.account_num);
-//                         assert.equal(RECORD3.routing_num, record.routing_num);
-
-//                         callback();
-//                     }
-//                 );
-//             }
-//         ], done);
-//     }
-
-//     public testCrudOperations(done) {
-//         let record1: SearchRecordV1;
-
-//         async.series([
-//             // Create items
-//             (callback) => {
-//                 this.testCreateSearch(callback);
-//             },
 //             // Get all records
 //             (callback) => {
-//                 this._persistence.getPageByFilter(
+//                 controller.getRecords(
 //                     null,
 //                     new FilterParams(),
 //                     new PagingParams(),
@@ -123,7 +107,7 @@
 //                         assert.isNull(err);
 
 //                         assert.isObject(page);
-//                         assert.lengthOf(page.data, 3);
+//                         assert.lengthOf(page.data, 2);
 
 //                         record1 = page.data[0];
 
@@ -135,7 +119,7 @@
 //             (callback) => {
 //                 record1.about = 'Updated About';
 
-//                 this._persistence.update(
+//                 controller.updateRecord(
 //                     null,
 //                     record1,
 //                     (err, record) => {
@@ -151,7 +135,7 @@
 //             },
 //             // Delete the record
 //             (callback) => {
-//                 this._persistence.deleteById(
+//                 controller.deleteRecordById(
 //                     null,
 //                     record1.id,
 //                     (err, record) => {
@@ -166,7 +150,7 @@
 //             },
 //             // Try to get deleted record
 //             (callback) => {
-//                 this._persistence.getOneById(
+//                 controller.getRecordById(
 //                     null,
 //                     record1.id,
 //                     (err, record) => {
@@ -179,65 +163,5 @@
 //                 )
 //             }
 //         ], done);
-//     }
-
-//     public testGetWithFilters(done) {
-//         async.series([
-//             // Create items
-//             (callback) => {
-//                 this.testCreateSearch(callback);
-//             },
-//             // Filter by id
-//             (callback) => {
-//                 this._persistence.getPageByFilter(
-//                     null,
-//                     FilterParams.fromTuples(
-//                         'id', '1'
-//                     ),
-//                     new PagingParams(),
-//                     (err, page) => {
-//                         assert.isNull(err);
-
-//                         assert.lengthOf(page.data, 1);
-
-//                         callback();
-//                     }
-//                 )
-//             },
-//             // Filter by account_num
-//             (callback) => {
-//                 this._persistence.getPageByFilter(
-//                     null,
-//                     FilterParams.fromTuples(
-//                         'account_num', '222222'
-//                     ),
-//                     new PagingParams(),
-//                     (err, page) => {
-//                         assert.isNull(err);
-
-//                         assert.lengthOf(page.data, 1);
-
-//                         callback();
-//                     }
-//                 )
-//             },
-//             // Filter by bank_name
-//             (callback) => {
-//                 this._persistence.getPageByFilter(
-//                     null,
-//                     FilterParams.fromTuples(
-//                         'bank_name', 'Bank 1'
-//                     ),
-//                     new PagingParams(),
-//                     (err, page) => {
-//                         assert.isNull(err);
-
-//                         assert.lengthOf(page.data, 2);
-
-//                         callback();
-//                     }
-//                 )
-//             }
-//         ], done);
-//     }
-// }
+//     });
+// });

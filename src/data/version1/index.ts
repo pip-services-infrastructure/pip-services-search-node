@@ -1,4 +1,5 @@
-export { RatingV1 } from './RatingV1';
-export { RatingV1Schema } from './RatingV1Schema';
-export { SearchV1 } from './SearchV1';
-export { SearchV1Schema } from './SearchV1Schema';
+export { ReferenceV1 } from './ReferenceV1';
+export { ReferenceV1Schema } from './ReferenceV1Schema';
+
+export { SearchRecordV1 } from './SearchRecordV1';
+export { SearchRecordV1Schema } from './SearchRecordV1Schema';

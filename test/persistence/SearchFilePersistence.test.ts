@@ -3,12 +3,13 @@
 // import { SearchFilePersistence } from '../../src/persistence/SearchFilePersistence';
 // import { SearchPersistenceFixture } from './SearchPersistenceFixture';
 
-// suite('SearchFilePersistence', ()=> {
+// suite('SearchFilePersistence', () => {
 //     let persistence: SearchFilePersistence;
 //     let fixture: SearchPersistenceFixture;
-    
+
 //     setup((done) => {
-//         persistence = new SearchFilePersistence('./data/search.test.json');
+//         persistence = new SearchFilePersistence('data/records.test.json');
+//         persistence.configure(new ConfigParams());
 
 //         fixture = new SearchPersistenceFixture(persistence);
 
@@ -16,17 +17,17 @@
 //             persistence.clear(null, done);
 //         });
 //     });
-    
+
 //     teardown((done) => {
 //         persistence.close(null, done);
 //     });
-        
+
 //     test('CRUD Operations', (done) => {
 //         fixture.testCrudOperations(done);
 //     });
 
 //     test('Get with Filters', (done) => {
-//         fixture.testGetWithFilter(done);
+//         fixture.testGetWithFilters(done);
 //     });
 
 // });

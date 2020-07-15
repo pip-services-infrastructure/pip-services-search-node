@@ -1,6 +1,6 @@
 {
     "name": "pip-services-search-node",
+    "registry": "practice-pip-services",
     "version": "1.0.0",
-    "registry": "pipdevs",
-    "build": 15
+    "build": "0"
 }
