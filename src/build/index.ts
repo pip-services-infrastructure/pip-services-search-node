@@ -1,1 +1,1 @@
-// export { SearchServiceFactory } from './SearchServiceFactory';
+export { SearchServiceFactory } from './SearchServiceFactory';

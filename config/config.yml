@@ -32,20 +32,21 @@
     database: {{MONGO_DB}}{{#unless MONGO_DB}}app{{/unless}}
 {{/if}}
 
-{{#if COUCHBASE_ENABLED}}
-# Couchbase Persistence
+{{#if ELASTIC_ENABLED}}
+# Elastic Persistence
 - descriptor: "pip-services-search:persistence:couchbase:default:1.0"
-  bucket: {{COUCHBASE_BUCKET}}{{#unless COUCHBASE_BUCKET}}app{{/unless}}
+  index: {{ELASTIC_INDEX}}{{#unless ELASTIC_INDEX}}search{{/unless}}
+  type: {{ELASTIC_TYPE}}{{#unless ELASTIC_TYPE}}search_records{{/unless}}
   connection:
-    uri: {{{COUCHBASE_SERVICE_URI}}}
-    host: {{{COUCHBASE_SERVICE_HOST}}}{{#unless COUCHBASE_SERVICE_HOST}}localhost{{/unless}}
-    port: {{COUCHBASE_SERVICE_PORT}}{{#unless COUCHBASE_SERVICE_PORT}}8091{{/unless}}
-  credential:
-    username: {{COUCHBASE_USER}}{{#unless COUCHBASE_USER}}Administrator{{/unless}}
-    password: {{COUCHBASE_PASS}}{{#unless COUCHBASE_PASS}}password{{/unless}}
+    host: {{{ELASTIC_SERVICE_HOST}}}{{#unless ELASTIC_SERVICE_HOST}}localhost{{/unless}}
+    port: {{ELASTIC_SERVICE_PORT}}{{#unless ELASTIC_SERVICE_PORT}}9200{{/unless}}
+  options:
+    reconnect: 60000
+    timeout: 30000
+    max_retries: 3
 {{/if}}
 
-{{#unless MEMORY_ENABLED}}{{#unless FILE_ENABLED}}{{#unless MONGO_ENABLED}}{{#unless COUCHBASE_ENABLED}}
+{{#unless MEMORY_ENABLED}}{{#unless FILE_ENABLED}}{{#unless MONGO_ENABLED}}{{#unless ELASTIC_ENABLED}}
 # Default to in-memory persistence, if nothing is set
 - descriptor: "pip-services-search:persistence:memory:default:1.0"
 {{/unless}}{{/unless}}{{/unless}}{{/unless}}
