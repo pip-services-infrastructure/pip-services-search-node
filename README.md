@@ -33,7 +33,6 @@ class SearchRecordV1 implements IStringIdentifiable {
     public refs?: ReferenceV1[]; // Reference to document or documents this comment bound to
 
     public name: string;
-    public description?: string;
     public time: Date;
     public field1?: string;
     public field2?: string;
@@ -171,7 +170,6 @@ var record = {
     type: 'Test type1',
     name: 'Test name 1',
     time: new Date(2014, 1, 1),
-    description: 'description1',
     refs: [
         {
             id: '1',
