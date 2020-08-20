@@ -51,7 +51,7 @@ class ReferenceV1 {
 }
 
 interface ISearchV1 {
-    getRecords(correlationId: string, filter: FilterParams, paging: PagingParams,
+    getRecords(correlationId: string, filter: FilterParams, paging: PagingParams, sort: SortParams,
         callback: (err: any, page: DataPage<SearchRecordV1>) => void): void;
 
     getRecordById(correlationId: string, recordId: string,

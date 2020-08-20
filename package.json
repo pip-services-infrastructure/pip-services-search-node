@@ -1,6 +1,6 @@
 {
   "name": "pip-services-search-node",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./obj/src/index.js",
   "typings": "./obj/src/index.d.ts",
   "scripts": {

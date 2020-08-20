@@ -23,9 +23,24 @@ class SearchCommandSet extends pip_services3_commons_node_1.CommandSet {
             .withOptionalProperty('paging', new pip_services3_commons_node_5.PagingParamsSchema()), (correlationId, args, callback) => {
             let filter = pip_services3_commons_node_1.FilterParams.fromValue(args.get('filter'));
             let paging = pip_services3_commons_node_1.PagingParams.fromValue(args.get('paging'));
-            let sort = new pip_services3_commons_node_1.SortParams(args.get('sort'));
+            let sort = this.createSortParams(args.get('sort'));
             this._controller.getRecords(correlationId, filter, paging, sort, callback);
         });
+    }
+    createSortParams(array) {
+        if (array == null)
+            return null;
+        let sort = new pip_services3_commons_node_1.SortParams();
+        array.forEach(map => {
+            if (map.hasOwnProperty('name') && map.hasOwnProperty('ascending')) {
+                let sortField = new pip_services3_commons_node_1.SortField();
+                sortField.name = pip_services3_commons_node_1.StringConverter.toNullableString(map['name']);
+                sortField.ascending = pip_services3_commons_node_1.BooleanConverter.toBooleanWithDefault(map['ascending'], true);
+                if (sortField.name)
+                    sort.push(sortField);
+            }
+        });
+        return sort;
     }
     makeGetRecordByIdCommand() {
         return new pip_services3_commons_node_2.Command('get_record_by_id', new pip_services3_commons_node_3.ObjectSchema(true)

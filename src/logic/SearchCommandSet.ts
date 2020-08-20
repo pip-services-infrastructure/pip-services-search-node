@@ -1,4 +1,4 @@
-import { CommandSet, FilterParams, PagingParams, DateTimeConverter, SortParams } from 'pip-services3-commons-node';
+import { CommandSet, FilterParams, PagingParams, DateTimeConverter, SortParams, AnyValue, AnyValueArray, SortField, BooleanConverter, StringConverter } from 'pip-services3-commons-node';
 import { ICommand } from 'pip-services3-commons-node';
 import { Command } from 'pip-services3-commons-node';
 import { ObjectSchema } from 'pip-services3-commons-node';
@@ -35,10 +35,28 @@ export class SearchCommandSet extends CommandSet {
             (correlationId: string, args: Parameters, callback: (err: any, result: any) => void) => {
                 let filter = FilterParams.fromValue(args.get('filter'));
                 let paging = PagingParams.fromValue(args.get('paging'));
-                let sort = new SortParams(args.get('sort'));
+                let sort = this.createSortParams(args.get('sort'));
+
                 this._controller.getRecords(correlationId, filter, paging, sort, callback);
             }
         );
+    }
+
+    createSortParams(array: any[]): SortParams {
+        if (array == null) return null;
+
+        let sort = new SortParams();
+        array.forEach(map => {
+            if (map.hasOwnProperty('name') && map.hasOwnProperty('ascending')) {
+                let sortField = new SortField();
+                sortField.name = StringConverter.toNullableString(map['name']);
+                sortField.ascending = BooleanConverter.toBooleanWithDefault(map['ascending'], true);
+
+                if (sortField.name) sort.push(sortField);
+            }
+        });
+
+        return sort;
     }
 
     private makeGetRecordByIdCommand(): ICommand {

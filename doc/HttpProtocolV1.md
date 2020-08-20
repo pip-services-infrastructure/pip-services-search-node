@@ -19,6 +19,7 @@ Get search records by filter
 - correlation_id: string - id that uniquely identifies transaction
 - filter: FilterParams - filter parameters
 - paging: PagingParams - paging parameters
+- sort: SortParams - sorting params
 
 **Response body:**
 - search_record: DataPage<SearchRecordV1> - Page with retrieved search records

@@ -12,7 +12,6 @@ class SearchRecordV1Schema extends pip_services3_commons_node_1.ObjectSchema {
         this.withOptionalProperty('subtype', pip_services3_commons_node_3.TypeCode.String);
         this.withOptionalProperty('refs', new pip_services3_commons_node_2.ArraySchema(new ReferenceV1Schema_1.ReferenceV1Schema()));
         this.withRequiredProperty('name', pip_services3_commons_node_3.TypeCode.String);
-        this.withOptionalProperty('description', pip_services3_commons_node_3.TypeCode.String);
         this.withOptionalProperty('time', pip_services3_commons_node_3.TypeCode.DateTime);
         this.withOptionalProperty('field1', pip_services3_commons_node_3.TypeCode.String);
         this.withOptionalProperty('field2', pip_services3_commons_node_3.TypeCode.String);

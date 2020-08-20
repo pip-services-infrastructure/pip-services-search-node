@@ -2,7 +2,7 @@ let async = require('async');
 let assert = require('chai').assert;
 let restify = require('restify');
 
-import { ConfigParams, SortParams } from 'pip-services3-commons-node';
+import { ConfigParams, SortParams, SortField } from 'pip-services3-commons-node';
 import { Descriptor } from 'pip-services3-commons-node';
 import { References } from 'pip-services3-commons-node';
 import { FilterParams } from 'pip-services3-commons-node';
@@ -16,6 +16,7 @@ import { TestModel } from '../../data/TestModel';
 
 const RECORD1: SearchRecordV1 = TestModel.createSearchRecord1();
 const RECORD2: SearchRecordV1 = TestModel.createSearchRecord2();
+const RECORD3: SearchRecordV1 = TestModel.createSearchRecord3();
 
 var httpConfig = ConfigParams.fromTuples(
     "connection.protocol", "http",
@@ -99,6 +100,20 @@ suite('SearchCommandableHttpServiceV1', () => {
                     }
                 );
             },
+            // Create the third record
+            (callback) => {
+                rest.post('/v1/search/set_record',
+                    {
+                        record: RECORD3
+                    },
+                    (err, req, res, record) => {
+                        assert.isNull(err);
+
+                        TestModel.assertEqualSearchRecord(record, RECORD3);
+                        callback();
+                    }
+                );
+            },
             // Get all records
             (callback) => {
                 rest.post('/v1/search/get_records',
@@ -111,7 +126,7 @@ suite('SearchCommandableHttpServiceV1', () => {
                         assert.isNull(err);
 
                         assert.isObject(page);
-                        assert.lengthOf(page.data, 2);
+                        assert.lengthOf(page.data, 3);
 
                         record1 = page.data[0];
 
@@ -172,4 +187,98 @@ suite('SearchCommandableHttpServiceV1', () => {
         ], done);
     });
 
+    test('Sorting', (done) => {
+        async.series([
+                        // Create the first record
+                        (callback) => {
+                            rest.post('/v1/search/set_record',
+                                {
+                                    record: RECORD1
+                                },
+                                (err, req, res, record) => {
+                                    assert.isNull(err);
+            
+                                    TestModel.assertEqualSearchRecord(record, RECORD1);
+                                    callback();
+                                }
+                            );
+                        },
+                        // Create the second record
+                        (callback) => {
+                            rest.post('/v1/search/set_record',
+                                {
+                                    record: RECORD2
+                                },
+                                (err, req, res, record) => {
+                                    assert.isNull(err);
+            
+                                    TestModel.assertEqualSearchRecord(record, RECORD2);
+                                    callback();
+                                }
+                            );
+                        },
+                        // Create the third record
+                        (callback) => {
+                            rest.post('/v1/search/set_record',
+                                {
+                                    record: RECORD3
+                                },
+                                (err, req, res, record) => {
+                                    assert.isNull(err);
+            
+                                    TestModel.assertEqualSearchRecord(record, RECORD3);
+                                    callback();
+                                }
+                            );
+                        },
+            
+            (callback) => {
+                setTimeout(() => {
+                    callback();
+                }, this._timeout);
+            },
+            // Sort by type
+            (callback) => {
+                rest.post('/v1/search/get_records',
+                    {
+                        filter: new FilterParams(),
+                        paging: new PagingParams(),
+                        sort: new SortParams(new SortField('type', true))
+                    },
+                    (err, req, res, page) => {
+                        assert.isNull(err);
+
+                        assert.lengthOf(page.data, 3);
+
+                        assert.equal(page.data[0].id, '1');
+                        assert.equal(page.data[1].id, '3');
+                        assert.equal(page.data[2].id, '2');
+
+                        callback();
+                    }
+                )
+            },
+            // Sort by time
+            (callback) => {
+                rest.post('/v1/search/get_records',
+                    {
+                        filter: new FilterParams(),
+                        paging: new PagingParams(),
+                        sort: new SortParams(new SortField('time', true))
+                    },
+                    (err, req, res, page) => {
+                        assert.isNull(err);
+
+                        assert.lengthOf(page.data, 3);
+
+                        assert.equal(page.data[0].id, '2');
+                        assert.equal(page.data[1].id, '1');
+                        assert.equal(page.data[2].id, '3');
+
+                        callback();
+                    }
+                )
+            },
+        ], done);
+    });
 });

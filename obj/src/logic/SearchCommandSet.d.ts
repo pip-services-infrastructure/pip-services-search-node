@@ -1,9 +1,10 @@
-import { CommandSet } from 'pip-services3-commons-node';
+import { CommandSet, SortParams } from 'pip-services3-commons-node';
 import { ISearchController } from '../../src/logic/ISearchController';
 export declare class SearchCommandSet extends CommandSet {
     private _controller;
     constructor(controller: ISearchController);
     private makeGetSearchCommand;
+    createSortParams(array: any[]): SortParams;
     private makeGetRecordByIdCommand;
     private makeSetRecordCommand;
     private makeUpdateRecordCommand;

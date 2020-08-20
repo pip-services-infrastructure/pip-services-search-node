@@ -15,7 +15,6 @@ export class SearchRecordV1Schema extends ObjectSchema {
         this.withOptionalProperty('refs', new ArraySchema(new ReferenceV1Schema()));
 
         this.withRequiredProperty('name', TypeCode.String);
-        this.withOptionalProperty('description', TypeCode.String);
         this.withOptionalProperty('time', TypeCode.DateTime);
         this.withOptionalProperty('field1', TypeCode.String);
         this.withOptionalProperty('field2', TypeCode.String);
