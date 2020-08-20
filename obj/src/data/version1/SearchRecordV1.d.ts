@@ -6,7 +6,6 @@ export declare class SearchRecordV1 implements IStringIdentifiable {
     subtype?: string;
     refs?: ReferenceV1[];
     name: string;
-    description?: string;
     time: Date;
     field1?: string;
     field2?: string;

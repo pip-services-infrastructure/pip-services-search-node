@@ -54,4 +54,7 @@ suite('SearchMongoDbPersistence', () => {
         fixture.testGetWithFilters(done);
     });
 
+    test('Sorting', (done) => {
+        fixture.testSorting(done);
+    });
 });

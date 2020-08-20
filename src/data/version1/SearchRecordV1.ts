@@ -9,7 +9,6 @@ export class SearchRecordV1 implements IStringIdentifiable {
     public refs?: ReferenceV1[]; // Reference to document or documents this comment bound to
 
     public name: string;
-    public description?: string;
     public time: Date;
     public field1?: string;
     public field2?: string;

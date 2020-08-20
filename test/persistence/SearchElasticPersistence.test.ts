@@ -52,4 +52,7 @@ suite('SearchElasticPersistence', () => {
         fixture.testGetWithFilters(done);
     });
 
+    test('Sorting', (done) => {
+        fixture.testSorting(done);
+    });
 });

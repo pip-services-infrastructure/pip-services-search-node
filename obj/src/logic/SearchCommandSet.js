@@ -23,7 +23,8 @@ class SearchCommandSet extends pip_services3_commons_node_1.CommandSet {
             .withOptionalProperty('paging', new pip_services3_commons_node_5.PagingParamsSchema()), (correlationId, args, callback) => {
             let filter = pip_services3_commons_node_1.FilterParams.fromValue(args.get('filter'));
             let paging = pip_services3_commons_node_1.PagingParams.fromValue(args.get('paging'));
-            this._controller.getRecords(correlationId, filter, paging, callback);
+            let sort = new pip_services3_commons_node_1.SortParams(args.get('sort'));
+            this._controller.getRecords(correlationId, filter, paging, sort, callback);
         });
     }
     makeGetRecordByIdCommand() {

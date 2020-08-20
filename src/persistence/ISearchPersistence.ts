@@ -1,11 +1,12 @@
 import { FilterParams } from 'pip-services3-commons-node';
+import { SortParams } from 'pip-services3-commons-node';
 import { PagingParams } from 'pip-services3-commons-node';
 import { DataPage } from 'pip-services3-commons-node';
 
 import { SearchRecordV1 } from '../data/version1/SearchRecordV1';
 
 export interface ISearchPersistence {
-    getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams, 
+    getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams, sort: SortParams, 
         callback: (err: any, page: DataPage<SearchRecordV1>) => void): void;
     
     getOneById(correlationId: string, id: string, 

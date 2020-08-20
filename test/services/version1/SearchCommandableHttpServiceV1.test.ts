@@ -2,7 +2,7 @@ let async = require('async');
 let assert = require('chai').assert;
 let restify = require('restify');
 
-import { ConfigParams } from 'pip-services3-commons-node';
+import { ConfigParams, SortParams } from 'pip-services3-commons-node';
 import { Descriptor } from 'pip-services3-commons-node';
 import { References } from 'pip-services3-commons-node';
 import { FilterParams } from 'pip-services3-commons-node';
@@ -104,7 +104,8 @@ suite('SearchCommandableHttpServiceV1', () => {
                 rest.post('/v1/search/get_records',
                     {
                         filter: new FilterParams(),
-                        paging: new PagingParams()
+                        paging: new PagingParams(),
+                        sort: new SortParams()
                     },
                     (err, req, res, page) => {
                         assert.isNull(err);

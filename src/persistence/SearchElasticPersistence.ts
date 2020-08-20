@@ -1,7 +1,7 @@
 let _ = require('lodash');
 
 import { ISearchPersistence } from './ISearchPersistence';
-import { FilterParams, IReferences, ConfigParams, ConfigException, IdGenerator } from 'pip-services3-commons-node';
+import { FilterParams, IReferences, ConfigParams, ConfigException, IdGenerator, SortParams } from 'pip-services3-commons-node';
 import { IReferenceable } from 'pip-services3-commons-node';
 import { IConfigurable } from 'pip-services3-commons-node';
 import { IOpenable } from 'pip-services3-commons-node';
@@ -19,6 +19,8 @@ export class SearchElasticPersistence implements ISearchPersistence, IReferencea
     private _reconnect: number = 60000;
     private _timeout: number = 30000;
     private _maxRetries: number = 3;
+
+    private _maxPageSize: number = 1000;
 
     private _client: any = null;
 
@@ -45,6 +47,7 @@ export class SearchElasticPersistence implements ISearchPersistence, IReferencea
         this._reconnect = config.getAsIntegerWithDefault('options.reconnect', this._reconnect);
         this._timeout = config.getAsIntegerWithDefault('options.timeout', this._timeout);
         this._maxRetries = config.getAsIntegerWithDefault('options.max_retries', this._maxRetries);
+        this._maxPageSize = config.getAsIntegerWithDefault('options.max_page_size', this._maxPageSize);
     }
 
     /**
@@ -186,16 +189,16 @@ export class SearchElasticPersistence implements ISearchPersistence, IReferencea
         );
     }
 
-    getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams, callback: (err: any, page: DataPage<SearchRecordV1>) => void): void {
-        let query = this.composeFilter(filter);
+    getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams, sort: SortParams,
+        callback: (err: any, page: DataPage<SearchRecordV1>) => void): void {
+
+        let bodyQuery = this.composeFilter(filter);
+        let bodySort = this.composeSort(sort);
+
         var records = [];
 
-        this._client.search({
-            'index': this._index,
-            'body': {
-                'query': query,
-            }
-        }, function getMoreUntilDone(err, response, status) {
+        let getMoreUntilDone = function (err, response, status) {
+
             response.hits.hits.forEach(function (hit) {
                 records.push(hit);
             });
@@ -207,10 +210,32 @@ export class SearchElasticPersistence implements ISearchPersistence, IReferencea
                     // scroll: '10s'
                 }, getMoreUntilDone);
             } else {
-                var page = new DataPage<SearchRecordV1>(records.map((value) => value['_source']));
+                paging = paging != null ? paging : new PagingParams();
+                let skip = paging.getSkip(-1);
+                let take = paging.getTake(this._maxPageSize);
+
+                let total = null;
+                if (paging.total)
+                    total = records.length;
+
+                if (skip > 0) {
+                    records = _.slice(records, skip);
+                }
+
+                records = _.take(records, take);
+
+                let page = new DataPage<SearchRecordV1>(records.map((value) => value['_source']), total);
                 callback(null, page);
             }
-        });
+        }.bind(this);
+
+        this._client.search({
+            'index': this._index,
+            'body': {
+                'query': bodyQuery,
+                'sort': bodySort
+            }
+        }, getMoreUntilDone);
     }
 
     getOneById(correlationId: string, id: string, callback: (err: any, item: SearchRecordV1) => void): void {
@@ -282,7 +307,7 @@ export class SearchElasticPersistence implements ISearchPersistence, IReferencea
             criteria.push({
                 'multi_match': {
                     'query': search,
-                    'fields': ['type', 'subtype', 'name', 'description', 'field1', 'field2', 'field3', 'content']
+                    'fields': ['type', 'subtype', 'name', 'field1', 'field2', 'field3', 'content']
                 }
             });
         }
@@ -346,10 +371,26 @@ export class SearchElasticPersistence implements ISearchPersistence, IReferencea
 
         var content = filter.getAsNullableString('content');
         if (content != null) {
-            criteria.push({ 'match': { 'content.keyword': content } });
+            criteria.push({ 'match': { 'content': content } });
         }
 
         return this.isEmpty(criteria) ? { 'match_all': {} } : { 'bool': { 'must': criteria } };
+    }
+
+    composeSort(sort: SortParams): any {
+        sort = sort || new SortParams();
+
+        let sortMap = [];
+        sort.forEach(sortField => {
+            let name = sortField.name == 'time' ? 'time' : sortField.name + '.keyword';
+            
+            let condition = {};
+            condition[name] = { 'order': sortField.ascending ? 'asc' : 'desc' };
+
+            sortMap.push(condition);
+        });
+
+        return sortMap;
     }
 
     private isEmpty(obj): boolean {

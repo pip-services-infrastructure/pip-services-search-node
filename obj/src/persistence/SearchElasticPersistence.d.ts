@@ -1,5 +1,5 @@
 import { ISearchPersistence } from './ISearchPersistence';
-import { FilterParams, IReferences, ConfigParams } from 'pip-services3-commons-node';
+import { FilterParams, IReferences, ConfigParams, SortParams } from 'pip-services3-commons-node';
 import { IReferenceable } from 'pip-services3-commons-node';
 import { IConfigurable } from 'pip-services3-commons-node';
 import { IOpenable } from 'pip-services3-commons-node';
@@ -14,6 +14,7 @@ export declare class SearchElasticPersistence implements ISearchPersistence, IRe
     private _reconnect;
     private _timeout;
     private _maxRetries;
+    private _maxPageSize;
     private _client;
     /**
      * Sets references to dependent components.
@@ -49,11 +50,12 @@ export declare class SearchElasticPersistence implements ISearchPersistence, IRe
      */
     close(correlationId: string, callback: (err: any) => void): void;
     clear(correlationId: string, callback?: (err: any) => void): void;
-    getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams, callback: (err: any, page: DataPage<SearchRecordV1>) => void): void;
+    getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams, sort: SortParams, callback: (err: any, page: DataPage<SearchRecordV1>) => void): void;
     getOneById(correlationId: string, id: string, callback: (err: any, item: SearchRecordV1) => void): void;
     create(correlationId: string, item: SearchRecordV1, callback: (err: any, item: SearchRecordV1) => void): void;
     update(correlationId: string, item: SearchRecordV1, callback: (err: any, item: SearchRecordV1) => void): void;
     deleteById(correlationId: string, id: string, callback: (err: any, item: SearchRecordV1) => void): void;
     private composeFilter;
+    composeSort(sort: SortParams): any;
     private isEmpty;
 }

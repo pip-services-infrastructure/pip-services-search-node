@@ -1,4 +1,4 @@
-import { FilterParams } from 'pip-services3-commons-node';
+import { FilterParams, SortParams } from 'pip-services3-commons-node';
 import { PagingParams } from 'pip-services3-commons-node';
 import { DataPage } from 'pip-services3-commons-node';
 import { ConfigParams } from 'pip-services3-commons-node';
@@ -38,9 +38,9 @@ export class SearchController implements ISearchController, IConfigurable, IRefe
         return this._commandSet;
     }
 
-    public getRecords(correlationId: string, filter: FilterParams, paging: PagingParams,
+    public getRecords(correlationId: string, filter: FilterParams, paging: PagingParams, sort: SortParams,
         callback: (err: any, page: DataPage<SearchRecordV1>) => void): void {
-        this._persistence.getPageByFilter(correlationId, filter, paging, callback);
+        this._persistence.getPageByFilter(correlationId, filter, paging, sort, callback);
     }
 
     public getRecordById(correlationId: string, recordId: string,

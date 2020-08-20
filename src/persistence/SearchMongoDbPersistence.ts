@@ -1,4 +1,4 @@
-import { FilterParams } from 'pip-services3-commons-node';
+import { FilterParams, SortParams } from 'pip-services3-commons-node';
 import { PagingParams } from 'pip-services3-commons-node';
 import { DataPage } from 'pip-services3-commons-node';
 
@@ -13,6 +13,17 @@ export class SearchMongoDbPersistence
     constructor() {
         super('search');
         this._maxPageSize = 1000;
+
+        this.ensureIndex({
+            type: 1, 
+            subtype: 1, 
+            name: 1, 
+            time: 1, 
+            field1: 1, 
+            field2: 1, 
+            field3: 1,
+            content: 1
+        });
     }
 
     private composeFilter(filter: FilterParams): any {
@@ -27,7 +38,6 @@ export class SearchMongoDbPersistence
             searchCriteria.push({ 'type': { $regex: searchRegex } });
             searchCriteria.push({ 'subtype': { $regex: searchRegex } });
             searchCriteria.push({ 'name': { $regex: searchRegex } });
-            searchCriteria.push({ 'description': { $regex: searchRegex } });
             searchCriteria.push({ 'field1': { $regex: searchRegex } });
             searchCriteria.push({ 'field2': { $regex: searchRegex } });
             searchCriteria.push({ 'field3': { $regex: searchRegex } });
@@ -52,11 +62,6 @@ export class SearchMongoDbPersistence
         var name = filter.getAsNullableString('name');
         if (name != null) {
             criteria.push({ name: name });
-        }
-
-        var description = filter.getAsNullableString('description');
-        if (name != null) {
-            criteria.push({ description: description });
         }
 
         var fromTime = filter.getAsNullableDateTime('from_time');
@@ -97,14 +102,26 @@ export class SearchMongoDbPersistence
 
         var content = filter.getAsNullableString('content');
         if (content != null) {
-            criteria.push({ content: content });
+            let searchRegex = new RegExp(content, "i");
+            criteria.push({ 'content': { $regex: searchRegex } });
         }
 
         return criteria.length > 0 ? { $and: criteria } : null;
     }
 
-    public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams,
+    private composeSort(sort: SortParams) {
+        sort = sort || new SortParams();
+        
+        let sortMap = {};
+        sort.forEach(sortField => {
+            sortMap[sortField.name] = sortField.ascending ? 1 : -1;
+        });
+
+        return sortMap;
+    }
+
+    public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams, sort: SortParams,
         callback: (err: any, page: DataPage<SearchRecordV1>) => void): void {
-        super.getPageByFilter(correlationId, this.composeFilter(filter), paging, null, null, callback);
+        super.getPageByFilter(correlationId, this.composeFilter(filter), paging, this.composeSort(sort), null, callback);
     }
 }

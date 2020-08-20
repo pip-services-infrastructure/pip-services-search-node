@@ -74,6 +74,7 @@ suite('SearchController', () => {
                     null,
                     new FilterParams(),
                     new PagingParams(),
+                    null,
                     (err, page) => {
                         assert.isNull(err);
 

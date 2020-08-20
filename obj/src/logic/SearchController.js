@@ -15,8 +15,8 @@ class SearchController {
         }
         return this._commandSet;
     }
-    getRecords(correlationId, filter, paging, callback) {
-        this._persistence.getPageByFilter(correlationId, filter, paging, callback);
+    getRecords(correlationId, filter, paging, sort, callback) {
+        this._persistence.getPageByFilter(correlationId, filter, paging, sort, callback);
     }
     getRecordById(correlationId, recordId, callback) {
         this._persistence.getOneById(correlationId, recordId, callback);

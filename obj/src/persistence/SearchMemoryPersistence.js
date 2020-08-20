@@ -14,7 +14,6 @@ class SearchMemoryPersistence extends pip_services3_data_node_1.IdentifiableMemo
         let type = filter.getAsNullableString('type');
         let subtype = filter.getAsNullableString('subtype');
         let name = filter.getAsNullableString('name');
-        let description = filter.getAsNullableString('description');
         let fromTime = filter.getAsNullableDateTime('from_time');
         let toTime = filter.getAsNullableDateTime('to_time');
         let field1 = filter.getAsNullableString('field1');
@@ -34,8 +33,6 @@ class SearchMemoryPersistence extends pip_services3_data_node_1.IdentifiableMemo
                 return false;
             if (name != null && item.name != name)
                 return false;
-            if (description != null && item.description != description)
-                return false;
             if (fromTime != null && item.time < fromTime)
                 return false;
             if (toTime != null && item.time > toTime)
@@ -46,15 +43,23 @@ class SearchMemoryPersistence extends pip_services3_data_node_1.IdentifiableMemo
                 return false;
             if (field3 != null && item.field3 != field3)
                 return false;
-            if (content != null && item.content != content)
+            if (content != null && !this.matchString(item.content, content))
                 return false;
             if (tags != null && item.tags != null && _.intersection(tags, item.tags).length != item.tags.length)
                 return false;
             return true;
         };
     }
-    getPageByFilter(correlationId, filter, paging, callback) {
-        super.getPageByFilter(correlationId, this.composeFilter(filter), paging, null, null, callback);
+    composeSort(sort) {
+        sort = sort || new pip_services3_commons_node_1.SortParams();
+        if (sort.some(item => item.name == 'type'))
+            return function (item) { return item.type; };
+        if (sort.some(item => item.name == 'time'))
+            return function (item) { return item.time; };
+        return null;
+    }
+    getPageByFilter(correlationId, filter, paging, sort, callback) {
+        super.getPageByFilter(correlationId, this.composeFilter(filter), paging, this.composeSort(sort), null, callback);
     }
     matchString(value, search) {
         if (value == null && search == null)
@@ -70,8 +75,6 @@ class SearchMemoryPersistence extends pip_services3_data_node_1.IdentifiableMemo
         if (this.matchString(item.subtype, search))
             return true;
         if (this.matchString(item.name, search))
-            return true;
-        if (this.matchString(item.description, search))
             return true;
         if (this.matchString(item.field1, search))
             return true;

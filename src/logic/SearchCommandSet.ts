@@ -1,4 +1,4 @@
-import { CommandSet, FilterParams, PagingParams, DateTimeConverter } from 'pip-services3-commons-node';
+import { CommandSet, FilterParams, PagingParams, DateTimeConverter, SortParams } from 'pip-services3-commons-node';
 import { ICommand } from 'pip-services3-commons-node';
 import { Command } from 'pip-services3-commons-node';
 import { ObjectSchema } from 'pip-services3-commons-node';
@@ -35,7 +35,8 @@ export class SearchCommandSet extends CommandSet {
             (correlationId: string, args: Parameters, callback: (err: any, result: any) => void) => {
                 let filter = FilterParams.fromValue(args.get('filter'));
                 let paging = PagingParams.fromValue(args.get('paging'));
-                this._controller.getRecords(correlationId, filter, paging, callback);
+                let sort = new SortParams(args.get('sort'));
+                this._controller.getRecords(correlationId, filter, paging, sort, callback);
             }
         );
     }

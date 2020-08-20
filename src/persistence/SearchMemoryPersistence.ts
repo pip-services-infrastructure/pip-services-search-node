@@ -1,6 +1,6 @@
 let _ = require('lodash');
 
-import { FilterParams } from 'pip-services3-commons-node';
+import { FilterParams, SortParams } from 'pip-services3-commons-node';
 import { PagingParams } from 'pip-services3-commons-node';
 import { DataPage } from 'pip-services3-commons-node';
 
@@ -26,7 +26,6 @@ export class SearchMemoryPersistence
         let type = filter.getAsNullableString('type');
         let subtype = filter.getAsNullableString('subtype');
         let name = filter.getAsNullableString('name');
-        let description = filter.getAsNullableString('description');
         let fromTime = filter.getAsNullableDateTime('from_time');
         let toTime = filter.getAsNullableDateTime('to_time');
         let field1 = filter.getAsNullableString('field1');
@@ -47,8 +46,6 @@ export class SearchMemoryPersistence
                 return false;
             if (name != null && item.name != name)
                 return false;
-            if (description != null && item.description != description)
-                return false;
             if (fromTime != null && item.time < fromTime)
                 return false;
             if (toTime != null && item.time > toTime)
@@ -59,7 +56,7 @@ export class SearchMemoryPersistence
                 return false;
             if (field3 != null && item.field3 != field3)
                 return false;
-            if (content != null && item.content != content)
+            if (content != null && !this.matchString(item.content, content))
                 return false;
             if (tags != null && item.tags != null && _.intersection(tags, item.tags).length != item.tags.length)
                 return false;
@@ -67,9 +64,21 @@ export class SearchMemoryPersistence
         };
     }
 
-    public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams,
+    private composeSort(sort: SortParams) {
+        sort = sort || new SortParams();
+
+        if (sort.some(item => item.name == 'type'))
+            return function (item) { return item.type; }
+
+        if (sort.some(item => item.name == 'time'))
+            return function (item) { return item.time; }
+
+        return null;
+    }
+
+    public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams, sort: SortParams,
         callback: (err: any, page: DataPage<SearchRecordV1>) => void): void {
-        super.getPageByFilter(correlationId, this.composeFilter(filter), paging, null, null, callback);
+        super.getPageByFilter(correlationId, this.composeFilter(filter), paging, this.composeSort(sort), null, callback);
     }
 
     private matchString(value: string, search: string): boolean {
@@ -85,7 +94,6 @@ export class SearchMemoryPersistence
         if (this.matchString(item.type, search)) return true;
         if (this.matchString(item.subtype, search)) return true;
         if (this.matchString(item.name, search)) return true;
-        if (this.matchString(item.description, search)) return true;
         if (this.matchString(item.field1, search)) return true;
         if (this.matchString(item.field2, search)) return true;
         if (this.matchString(item.field3, search)) return true;

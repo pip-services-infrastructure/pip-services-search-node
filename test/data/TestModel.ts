@@ -30,7 +30,6 @@ export class TestModel {
             type: 'Test type2',
             name: 'Test name 2',
             time: new Date(2014, 1, 1),
-            description: 'description1',
             refs: [
                 {
                     id: '1',
@@ -50,7 +49,6 @@ export class TestModel {
             type: 'Test type1',
             name: 'Test name 3',
             time: new Date(Date.now()),
-            description: 'description1',
             refs: [
                 {
                     id: '2',
@@ -74,7 +72,6 @@ export class TestModel {
         assert.equal(expected.id, actual.id);
         assert.equal(expected.type, actual.type);
         assert.equal(expected.name, actual.name);
-        assert.equal(expected.description, actual.description);
         assert.equal(expected.time?.toISOString(), actual.time?.toISOString());
         assert.equal(expected.field1, actual.field1);
         assert.equal(expected.field2, actual.field2);
